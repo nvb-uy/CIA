@@ -11,6 +11,7 @@ import elocindev.customitemattributes.CustomItemAttributes;
 import elocindev.customitemattributes.api.GenericAttribute;
 import elocindev.customitemattributes.api.ItemProperty;
 import net.fabricmc.fabric.api.item.v1.ModifyItemAttributeModifiersCallback;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.item.ItemStack;
@@ -23,30 +24,13 @@ public class AttributeBuilderCallback {
                 if (item.getItem() != stack.getItem()) continue;
 
                 NbtCompound nbt = stack.getNbt();
-                if (nbt != null && nbt.getBoolean("Unbreakable") != item.unbreakable) {
+                if (nbt != null && (item.unbreakable || item.shouldForceUnbreakable())) {
                     nbt.putBoolean("Unbreakable", item.unbreakable);
                     stack.writeNbt(nbt);
                 }
 
-                switch(slot) {
-                    case MAINHAND:
-                        applyModifiers(stack, item, item.overrides_main_hand, builder);
-                        break;
-                    case OFFHAND:
-                        applyModifiers(stack, item, item.overrides_off_hand, builder);
-                        break;
-                    case HEAD:
-                        applyModifiers(stack, item, item.overrides_head, builder);
-                        break;
-                    case CHEST:
-                        applyModifiers(stack, item, item.overrides_chest, builder);
-                        break;
-                    case LEGS:
-                        applyModifiers(stack, item, item.overrides_legs, builder);
-                        break;
-                    case FEET:
-                        applyModifiers(stack, item, item.overrides_feet, builder);
-                        break;
+                for (String id : item.getSlotNames()) if (slot == EquipmentSlot.byName(id)) {
+                    applyModifiers(stack, item, item.attribute_overrides, builder);
                 }
             }
         });
@@ -60,7 +44,7 @@ public class AttributeBuilderCallback {
 
                 newModifiers.add(
                     new EntityAttributeModifier(
-                        UUID.nameUUIDFromBytes(generic_attribute.getString().getBytes()), 
+                        UUID.nameUUIDFromBytes((stack.toString()+generic_attribute.toString()).getBytes()), 
                         "Custom Item Attributes Modifier", 
                         generic_attribute.getDouble(), 
                         generic_attribute.getOperation()

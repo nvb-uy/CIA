@@ -1,0 +1,5 @@
+## 2.0.0
+- BREAKING: Config moved to the custom_item_attributes folder, with the config now named overrides.json5
+- BREAKING: Config format changed, now instead of there being a config for each slot, to reduce clutter it has been changed to the slot being defined in the entry itself as an array, so you can put multiple slots. Curios/Trinkets/Accessories support is not yet added, for now. If you're confused about this, just check the new config and you'll see what I mean!
+- Fixed attributes not being able to be applied on multiple items at the same time due to UUID generation. It's now unique depending on the item type and attribute.
+- Fixed items being forced to not be unbreakable, now you can add a config without the unbreakable tag, making it ignore unbreakability and not breaking mods that would change the state of the item such as the Hardening Catalyst from the Things mod. This bug also turned into a feature, as it's now defined as the "force_unbreakable" option in the config. Setting it to true will bring back the old behavior.

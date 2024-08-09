@@ -7,42 +7,66 @@ import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 
 public class ItemProperty {
-    public ItemProperty(String itemid, 
-            List<GenericAttribute<String,?>> overrides_main_hand,
-            List<GenericAttribute<String,?>> overrides_off_hand,
-            List<GenericAttribute<String,?>> overrides_head,
-            List<GenericAttribute<String,?>> overrides_chest,
-            List<GenericAttribute<String,?>> overrides_legs,
-            List<GenericAttribute<String,?>> overrides_feet,            
-    boolean isUnbreakable) {
-        this.item = itemid;
+    public String item;
+    public List<String> affected_slots;
+    public List<GenericAttribute<String,?>> attribute_overrides;
+    public boolean unbreakable;
+    public boolean force_unbreakable = false;
+
+    public ItemProperty(
+        String item_id,
+        List<String> slot_names,
+        List<GenericAttribute<String,?>> attribute_overrides        
+    ) {
+        this.item = item_id;
+        this.attribute_overrides = attribute_overrides;
+        this.affected_slots = slot_names;
+    }
+
+    public ItemProperty(
+        String item_id,
+        List<String> slot_names,
+        List<GenericAttribute<String,?>> attribute_overrides,         
+        boolean isUnbreakable
+    ) {
+        this.item = item_id;
+        this.affected_slots = slot_names;
         
-        this.overrides_head = overrides_head;
-        this.overrides_chest = overrides_chest;
-        this.overrides_legs = overrides_legs;
-        this.overrides_feet = overrides_feet;
-        this.overrides_main_hand = overrides_main_hand;
-        this.overrides_off_hand = overrides_off_hand;
+        this.attribute_overrides = attribute_overrides;
 
         this.unbreakable = isUnbreakable;
+        this.force_unbreakable = true;
+    }
+
+    public ItemProperty(
+        String item_id,
+        List<String> slot_names,
+        List<GenericAttribute<String,?>> attribute_overrides,         
+        boolean isUnbreakable,
+        boolean force_unbreakable
+    ) {
+        this.item = item_id;
+        this.affected_slots = slot_names;
+        
+        this.attribute_overrides = attribute_overrides;
+
+        this.unbreakable = isUnbreakable;
+        this.force_unbreakable = force_unbreakable;
     }
 
     public Item getItem() {
         return Registries.ITEM.get(new Identifier(item));
     }
 
+    public List<String> getSlotNames() {
+        return affected_slots;
+    }
+
     public Identifier getIdentifier() {
         return new Identifier(item);
     }
 
-    public String item;
-
-    public List<GenericAttribute<String,?>> overrides_main_hand;
-    public List<GenericAttribute<String,?>> overrides_off_hand;
-    public List<GenericAttribute<String,?>> overrides_head;
-    public List<GenericAttribute<String,?>> overrides_chest;
-    public List<GenericAttribute<String,?>> overrides_legs;
-    public List<GenericAttribute<String,?>> overrides_feet;
-
-    public boolean unbreakable;
+    public boolean shouldForceUnbreakable() {
+        return force_unbreakable;
+    }
 }

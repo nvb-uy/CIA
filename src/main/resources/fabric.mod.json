@@ -11,7 +11,7 @@
 		"homepage": "https://github.com/nvb-uy/",
 		"sources": "https://github.com/nvb-uy/CIA"
 	},
-	"license": "MIT",
+	"license": "AGNYA License",
 	"icon": "assets/customitemattributes/icon.png",
 	"environment": "*",
 	"entrypoints": {
