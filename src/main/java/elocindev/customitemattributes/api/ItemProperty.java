@@ -2,6 +2,7 @@ package elocindev.customitemattributes.api;
 
 import java.util.List;
 
+import net.minecraft.component.type.AttributeModifierSlot;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
@@ -55,7 +56,7 @@ public class ItemProperty {
     }
 
     public Item getItem() {
-        return Registries.ITEM.get(new Identifier(item));
+        return Registries.ITEM.getOrEmpty(Identifier.of(item)).orElse(null);
     }
 
     public List<String> getSlotNames() {
@@ -63,7 +64,7 @@ public class ItemProperty {
     }
 
     public Identifier getIdentifier() {
-        return new Identifier(item);
+        return Identifier.of(item);
     }
 
     public boolean shouldForceUnbreakable() {

@@ -1,64 +1,61 @@
 package elocindev.customitemattributes.api;
 
+import com.google.gson.JsonPrimitive;
+import com.mojang.serialization.JsonOps;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier.Operation;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
 
 public class GenericAttribute<A, V> {
     private A attribute;
     private V value;
     private String operation;
+    private String id;
 
-    public GenericAttribute(A attribute, V value, String operation) {
+    public GenericAttribute(A attribute, V value, String operation, String id) {
         this.attribute = attribute;
         this.value = value;
-
-        if (operation.toUpperCase() == "ADDITION" || operation.toUpperCase() == "MULTIPLY_BASE" || operation.toUpperCase() == "MULTIPLY_TOTAL") {
-            this.operation = operation.toUpperCase();
-        } else {
-            this.operation = "ADDITION";
-        }
+        this.operation = operation;
+        this.id = id;
     }
 
-    public EntityAttribute getAttribute() throws InvalidAttributeException {
+    public RegistryEntry<EntityAttribute> getAttribute() throws InvalidAttributeException {
         if (attribute instanceof String attributeId) {
-            EntityAttribute entAttribute = Registries.ATTRIBUTE.get(new Identifier(attributeId));
+            RegistryEntry<EntityAttribute> entAttribute = Registries.ATTRIBUTE.getEntry(Identifier.of(attributeId))
+                    .orElseThrow(() -> new InvalidAttributeException("Attribute not found: " + attribute));
 
-            if (entAttribute != null) 
-                return entAttribute;
+            return entAttribute;
         }
 
         throw new InvalidAttributeException("Attribute not found: " + attribute);
     }
 
     public String getString() throws InvalidAttributeException {
-        if (attribute instanceof String) {
-            return (String) attribute;
+        if (attribute instanceof String attributeName) {
+            return attributeName;
         }
 
-        throw new InvalidAttributeException("Invalid Type: " + attribute+" must be String");
+        throw new InvalidAttributeException("Invalid Type: " + attribute + " must be String");
     }
 
     public Operation getOperation() {
-        switch (this.operation) {
-            case "ADDITION":
-                return Operation.ADDITION;
-            case "MULTIPLY_BASE":
-                return Operation.MULTIPLY_BASE;
-            case "MULTIPLY_TOTAL":
-                return Operation.MULTIPLY_TOTAL;
-        }
-
-        return Operation.ADDITION;
+        return Operation.CODEC.decode(JsonOps.INSTANCE, new JsonPrimitive(operation))
+                .getOrThrow()
+                .getFirst();
     }
 
     public double getDouble() throws InvalidAttributeException {
-        if (value instanceof Double) {
-            return (Double) value;
+        if (value instanceof Double doubleValue) {
+            return doubleValue;
         }
 
         throw new InvalidAttributeException("Invalid Type: " + value+" must be Double");
+    }
+
+    public Identifier getId() {
+        return Identifier.of(id);
     }
 
     public V getValue() {
